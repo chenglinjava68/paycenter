@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+	  <groupId>com.qccr.paycenter</groupId>
+      <artifactId>paycenter-parent</artifactId>
+	  <relativePath>../../pom.xml</relativePath>
+	  <version>1.2.2</version>
+  </parent>
+	<version>1.2.2</version>
+  <artifactId>paycenter-biz</artifactId>
+  <name>paycenter-biz</name>
+  <url>http://maven.apache.org</url>
+
+  <dependencies>
+  	
+  	<dependency>
+		<groupId>com.qccr.paycenter</groupId>
+		<artifactId>paycenter-dal</artifactId>
+		<version>1.2.2</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>com.qccr.paycenter</groupId>
+		<artifactId>paycenter-integration</artifactId>
+		<version>1.2.2</version>
+	</dependency>
+	<dependency>
+		<groupId>dom4j</groupId>
+		<artifactId>dom4j</artifactId>
+		<version>1.6.1</version>
+	</dependency>
+
+  </dependencies>
+</project>

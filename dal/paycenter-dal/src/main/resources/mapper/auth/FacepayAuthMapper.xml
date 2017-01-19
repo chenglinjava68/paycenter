@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qccr.paycenter.dal.dao.auth.FacepayAuthDao" >
+    
+    <resultMap id="BaseResultMap" type="com.qccr.paycenter.dal.domain.auth.FacepayAuthDO" >
+        <id column="id" property="id" />
+        <result column="super_user_id" property="superUserId" />
+        <result column="channel" property="channel" />
+        <result column="app_id" property="appId" />
+        <result column="app_auth_code" property="appAuthCode" />
+        <result column="code_create_time" property="codeCreateTime" />
+        <result column="app_auth_token" property="appAuthToken" />
+        <result column="token_create_time" property="tokenCreateTime" />
+        <result column="out_user_id" property="outUserId" />
+        <result column="out_auth_app_id" property="outAuthAppId" />
+        <result column="expires_in" property="expiresIn" />
+        <result column="re_expires_in" property="reExpiresIn" />
+        <result column="app_refresh_token" property="appRefreshToken" />
+        <result column="status" property="status" />
+        <result column="notifyurl_create_time" property="notifyurlCreateTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+        id, super_user_id, channel, app_id, app_auth_code, code_create_time, app_auth_token, 
+        token_create_time, out_user_id, out_auth_app_id, expires_in, re_expires_in, app_refresh_token, 
+        status, create_time, update_time,notifyurl_create_time
+    </sql>
+    
+    <!--查询-->
+    <select id="query" resultMap="BaseResultMap" parameterType="com.qccr.paycenter.dal.domain.auth.FacepayAuthDO" >
+        select
+        <include refid="Base_Column_List" />
+            from facepay_auth
+            where 1=1 
+
+        <if test="id != null" >
+              and id = #{id}
+        </if>
+        
+        <if test="superUserId != null" >
+              and super_user_id = #{superUserId}
+        </if>
+        
+        <if test="channel != null" >
+              and channel = #{channel}
+        </if>
+        
+        <if test="appId != null" >
+              and app_id = #{appId}
+        </if>
+        
+        <if test="appAuthCode != null" >
+              and app_auth_code = #{appAuthCode}
+        </if>
+        
+        <if test="codeCreateTime != null" >
+              and code_create_time = #{codeCreateTime}
+        </if>
+        
+        <if test="appAuthToken != null" >
+              and app_auth_token = #{appAuthToken}
+        </if>
+        
+        <if test="tokenCreateTime != null" >
+              and token_create_time = #{tokenCreateTime}
+        </if>
+        
+        <if test="outUserId != null" >
+              and out_user_id = #{outUserId}
+        </if>
+        
+        <if test="outAuthAppId != null" >
+              and out_auth_app_id = #{outAuthAppId}
+        </if>
+        
+        <if test="expiresIn != null" >
+              and expires_in = #{expiresIn}
+        </if>
+        
+        <if test="reExpiresIn != null" >
+              and re_expires_in = #{reExpiresIn}
+        </if>
+        
+        <if test="appRefreshToken != null" >
+              and app_refresh_token = #{appRefreshToken}
+        </if>
+        
+        <if test="status != null" >
+              and status = #{status}
+        </if>
+        
+        <if test="createTime != null" >
+              and create_time = #{createTime}
+        </if>
+        
+        <if test="updateTime != null" >
+              and update_time = #{updateTime}
+        </if>
+
+        <if test="notifyurlCreateTime != null" >
+              and notifyurl_create_time = #{notifyurlCreateTime}
+        </if>
+
+        
+    </select>
+
+    
+    <!--增加-->
+    <insert id="insert" parameterType="com.qccr.paycenter.dal.domain.auth.FacepayAuthDO" >
+        insert into facepay_auth (id, super_user_id, channel, app_id, app_auth_code, code_create_time, 
+            app_auth_token, token_create_time, out_user_id, out_auth_app_id, expires_in, 
+            re_expires_in, app_refresh_token, status, create_time, update_time,notifyurl_create_time)
+        values (#{id}, #{superUserId}, #{channel}, #{appId}, #{appAuthCode}, #{codeCreateTime}, 
+            #{appAuthToken}, #{tokenCreateTime}, #{outUserId}, #{outAuthAppId}, #{expiresIn}, 
+            #{reExpiresIn}, #{appRefreshToken}, #{status}, now(), now(),#{notifyurlCreateTime})
+    </insert>
+    
+    <!--更新-->
+    <update id="update" parameterType="com.qccr.paycenter.dal.domain.auth.FacepayAuthDO" >
+        update facepay_auth
+        <set >
+            update_time = now()
+            <if test="superUserId != null" >
+                ,super_user_id = #{superUserId}
+            </if>
+            
+            <if test="channel != null" >
+                ,channel = #{channel}
+            </if>
+            
+            <if test="appId != null" >
+                ,app_id = #{appId}
+            </if>
+            
+            <if test="appAuthCode != null" >
+                ,app_auth_code = #{appAuthCode}
+            </if>
+            
+            <if test="codeCreateTime != null" >
+                ,code_create_time = #{codeCreateTime}
+            </if>
+            
+            <if test="appAuthToken != null" >
+                ,app_auth_token = #{appAuthToken}
+            </if>
+            
+            <if test="tokenCreateTime != null" >
+                ,token_create_time = #{tokenCreateTime}
+            </if>
+            
+            <if test="outUserId != null" >
+                ,out_user_id = #{outUserId}
+            </if>
+            
+            <if test="outAuthAppId != null" >
+                ,out_auth_app_id = #{outAuthAppId}
+            </if>
+            
+            <if test="expiresIn != null" >
+                ,expires_in = #{expiresIn}
+            </if>
+            
+            <if test="reExpiresIn != null" >
+                ,re_expires_in = #{reExpiresIn}
+            </if>
+            
+            <if test="appRefreshToken != null" >
+                ,app_refresh_token = #{appRefreshToken}
+            </if>
+            
+            <if test="status != null" >
+                ,status = #{status}
+            </if>
+            <if test="notifyurlCreateTime != null" >
+                ,notifyurl_create_time = #{notifyurlCreateTime}
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
+    <select id="findBySuperUserId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from facepay_auth
+        where super_user_id = #{superUserId} and status in(0,1) limit 1
+    </select>
+    <update id="updateStatusBySuperUserId" parameterType="java.lang.Long">
+        update facepay_auth  set  status=2,update_time=now() where super_user_id = #{superUserId} and status=1
+    </update>
+    <update id="updateBySuperUserId" parameterType="java.util.Map" >
+        update facepay_auth
+        <set >
+            update_time = now()
+            <if test="channel != null" >
+                ,channel = #{channel}
+            </if>
+
+            <if test="appId != null" >
+                ,app_id = #{appId}
+            </if>
+
+            <if test="appAuthCode != null" >
+                ,app_auth_code = #{appAuthCode}
+            </if>
+
+            <if test="codeCreateTime != null" >
+                ,code_create_time = #{codeCreateTime}
+            </if>
+
+            <if test="appAuthToken != null" >
+                ,app_auth_token = #{appAuthToken}
+            </if>
+
+            <if test="tokenCreateTime != null" >
+                ,token_create_time = #{tokenCreateTime}
+            </if>
+
+            <if test="outUserId != null" >
+                ,out_user_id = #{outUserId}
+            </if>
+
+            <if test="outAuthAppId != null" >
+                ,out_auth_app_id = #{outAuthAppId}
+            </if>
+
+            <if test="expiresIn != null" >
+                ,expires_in = #{expiresIn}
+            </if>
+
+            <if test="reExpiresIn != null" >
+                ,re_expires_in = #{reExpiresIn}
+            </if>
+
+            <if test="appRefreshToken != null" >
+                ,app_refresh_token = #{appRefreshToken}
+            </if>
+
+            <if test="status != null" >
+                ,status = #{status}
+            </if>
+            <if test="notifyurlCreateTime != null" >
+                ,notifyurl_create_time = #{notifyurlCreateTime}
+            </if>
+
+        </set>
+        where super_user_id = #{superUserId} and status=0
+    </update>
+    <select id="findNormalBySuperUserId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from facepay_auth
+        where super_user_id = #{superUserId} and status=1 limit 1
+    </select>
+    <select id="findOneBySuperUserId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from facepay_auth
+        where super_user_id = #{superUserId} and status in(0,2) ORDER BY create_time DESC limit 1
+    </select>
+    <resultMap id="AuthTimeoutTokenResultMap" type="com.qccr.paycenter.model.dal.dbo.pay.AuthTokenRefreshQueryDO">
+        <result column="super_user_id" property="superUserId" />
+        <result column="app_refresh_token" property="appRefreshToken" />
+    </resultMap>
+    <select id="queryNextTimeoutTokens" resultMap="AuthTimeoutTokenResultMap">
+        select id, super_user_id,app_refresh_token,channel
+        FROM facepay_auth
+        where now() <![CDATA[ < ]]> date_add(token_create_time, interval expires_in SECOND )
+        and   now() <![CDATA[ >= ]]> date_add(token_create_time, interval #{days} DAY )
+        and status=1
+        and mod(id,#{shardingCount}) in
+        <foreach collection="shardingItems" item="shard" index="index" open="(" separator="," close=")">
+            #{shard}
+        </foreach>
+        ORDER BY token_create_time
+    </select>
+</mapper>

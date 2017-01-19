@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qccr.paycenter.dal.mapper.refund.RefundOrderMapper">
+
+	<resultMap id="refundOrderResultMap" type="com.qccr.paycenter.dal.domain.refund.RefundOrderDO">
+		<id column="id"  property="id" />
+		<id column="batch_no"  property="batchNo" />
+		<id column="refund_serial_no"  property="refundSerialNo" />
+		<id column="refund_no"  property="refundNo" />
+		<id column="out_refund_no"  property="outRefundNo" />
+		<id column="mch_id"  property="mchId" />
+		<id column="refund_account"  property="refundAccount" />
+		<id column="refund_fee" property="refundFee" />
+		<id column="business_no" property="businessNo" />
+		<id column="business_type" property="businessType" />
+		<id column="refund_channel"  property="refundChannel" />
+		<id column="refund_type" property="refundType" />		
+		<id column="total_fee" property="totalFee" />				
+		<id column="pay_no" property="payNo"/>
+		<id column="pay_bill_no" property="payBillNo"/>		
+		<id column="refund_bill_no" property="refundBillNo"/>
+		<id column="notify_url" property="notifyUrl" />
+		<id column="notify_status" property="notifyStatus" />
+		<id column="subject" property="subject" />
+		<id column="remark" property="remark" />
+		<id column="status" property="status" />
+		<id column="partner" property="partner" />
+		<id column="refund_time" property="refundTime" />
+		<id column="success_time" property="successTime" />
+		<id column="create_time" property="createTime" />		
+		<id column="update_time" property="updateTime" />
+		<id column="create_person" property="createPerson" />
+		<id column="update_person" property="updatePerson" />
+		<id column="trade_no" property="tradeNo" />
+	</resultMap>
+	<sql id="RefundOrder_Column_List">
+		id, batch_no, refund_serial_no, refund_no,out_refund_no, mch_id, refund_account, refund_fee,
+		refund_time, business_no,business_type,refund_channel,refund_type,total_fee,
+		pay_no, pay_bill_no, refund_bill_no, notify_url,notify_status,subject,remark,status,partner,success_time,create_time
+		,update_time,create_person,update_person,trade_no
+	</sql>
+	
+	<select id="findByBusinessNo" resultMap="refundOrderResultMap" parameterType="string">
+		select
+			<include refid="RefundOrder_Column_List" />
+		from refund_order
+		
+		where business_no=#{bizNo} limit 1
+	
+	</select>
+	
+	<select id="findByPayNo"  resultMap="refundOrderResultMap" parameterType="string">
+		select
+			<include refid="RefundOrder_Column_List" />
+		from refund_order
+
+		where pay_no=#{payNo} limit 1
+	
+	</select>
+
+	<select id="findByPayNoAndOutRefundNo"  resultMap="refundOrderResultMap" parameterType="string">
+		select
+		<include refid="RefundOrder_Column_List" />
+		from refund_order
+		where pay_no=#{payNo} and out_refund_no=#{outRefundNo} limit 1
+	</select>
+	<select id="queryByPayNo"  resultMap="refundOrderResultMap" parameterType="string">
+		select
+		<include refid="RefundOrder_Column_List" />
+		from refund_order
+		where pay_no=#{payNo} and status in (0,1,3,4,6) order by refund_time
+	</select>
+	<select id="sumRefundFeeByTradeNo"  resultType="int" parameterType="string">
+		select ifnull(sum(refund_fee),0) from refund_order
+		where trade_no=#{tradeNo} and status in (0,1,3,4,6)
+	</select>
+
+	
+	<insert id="insert" parameterType="com.qccr.paycenter.dal.domain.refund.RefundOrderDO">
+	 	
+		insert into refund_order(batch_no, refund_serial_no, refund_no,out_refund_no, mch_id, refund_account, refund_fee,
+		 business_no,business_type,refund_channel,refund_type,total_fee,
+		pay_no, pay_bill_no, refund_bill_no, notify_url,notify_status,subject,remark,status,partner,refund_time,create_time,update_time,trade_no) values(#{batchNo},
+		#{refundSerialNo},#{refundNo},#{outRefundNo},#{mchId},#{refundAccount},#{refundFee},#{businessNo}
+		,#{businessType},#{refundChannel},#{refundType},#{totalFee},#{payNo},#{payBillNo},#{refundBillNo},#{notifyUrl}
+		,#{notifyStatus},#{subject},#{remark},#{status},#{partner},now(),now(),now(),#{tradeNo})
+	
+	</insert>
+	
+	<update id="updateSerialNo" parameterType="com.qccr.paycenter.dal.domain.refund.RefundOrderDO">
+	
+		update refund_order  set  refund_serial_no=#{paySerialNo},update_time=now() where refund_no = #{refundNo}
+	
+	</update>
+	
+	<update id="mergeStatusAndSerialNo" parameterType="java.util.Map">
+			
+		update refund_order  set  refund_serial_no=#{serialNo},status=#{status},update_time=now() where refund_no = #{refundNo}
+	
+	</update>
+
+
+	<select id="findByRefundNo" resultMap="refundOrderResultMap" parameterType="string">
+
+		select * from  refund_order where  refund_no = #{refunNo} limit 1
+
+	</select>
+	
+	<update id="updateStatusByRefundNo" parameterType="java.util.Map">
+		
+		update refund_order  set status=#{status},update_time=now() where refund_no= #{refundNo}
+		
+	</update>
+	
+	<!--<select id="findByBatchNo" resultMap="refundOrderResultMap" parameterType="string">-->
+	<!---->
+		<!--select * from  refund_order where  batch_no = #{batchNo} limit 1-->
+	<!---->
+	<!--</select>-->
+	
+	<update id="syncRefundMerge" parameterType="java.util.Map">
+	
+		update refund_order  set  refund_bill_no=#{refundBillNo},refund_serial_no=#{serialNo},status=#{status},update_time=now() where refund_no = #{refundNo}
+	
+	 </update>
+
+	<update id="refundSuccess">
+		update refund_order set refund_bill_no=#{refundBillNo},refund_serial_no=#{serialNo},status=1,success_time=#{successTime},update_time=now() where refund_no = #{refundNo}
+		and status in (0,2,4,6)
+	</update>
+
+	<update id="refundMerge">
+		update refund_order set refund_bill_no=#{refundBillNo},refund_serial_no=#{serialNo},status=#{status},update_time=now() where refund_no = #{refundNo}
+		and status in <foreach collection="statusList" item="item" index="index" open="("
+							  separator="," close=")">
+							#{item}
+						</foreach>
+	</update>
+
+	<select id="queryTimingInThreeDays" resultMap="refundOrderResultMap">
+
+		select * from refund_order r where create_time  <![CDATA[ >= ]]> date_add(curdate(), interval -3 day) and create_time <![CDATA[ <= ]]> now()
+		and status in(0,4,6) and refund_fee <![CDATA[ >= ]]> #{minAmount} and refund_fee <![CDATA[ <= ]]> #{maxAmount}
+
+	</select>
+	
+	<select id="queryTimingInDaysBySharding" resultMap="refundOrderResultMap">
+		select * from refund_order r where create_time  <![CDATA[ >= ]]> date_add(curdate(), interval -#{days} day) and create_time <![CDATA[ <= ]]> now()
+		and status in(0,4,6) and refund_fee <![CDATA[ >= ]]> #{minAmount} and refund_fee <![CDATA[ <= ]]> #{maxAmount} and mod(id, #{shardingNum}) in
+		<foreach collection="shardingList" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<update id="updateSuccessTimeByRefundNo">
+		update refund_order set  status=1,success_time=now(),update_time=now() where refund_no = #{refundNo}
+	</update>
+
+	<update id="updateRefundSerialNoByRefundNo" parameterType="java.util.Map">
+		update refund_order  set refund_serial_no=#{refundSerialNo},update_time=now() where refund_no= #{refundNo}
+	</update>
+
+</mapper>

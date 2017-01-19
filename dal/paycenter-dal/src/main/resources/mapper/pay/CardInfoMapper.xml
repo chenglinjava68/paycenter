@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qccr.paycenter.dal.dao.pay.CardInfoDao" >
+
+    <resultMap id="BaseResultMap" type="com.qccr.paycenter.dal.domain.pay.CardInfoDO" >
+        <id column="id" property="id" />
+        <result column="card_name" property="cardName" />
+        <result column="card_no" property="cardNo" />
+        <result column="expiry_date" property="expiryDate" />
+        <result column="card_type" property="cardType" />
+        <result column="user_id" property="userId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_person" property="createPerson" />
+        <result column="update_person" property="updatePerson" />
+        <result column="is_sign" property="isSign" />
+        <result column="pay_channel" property="payChannel" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, card_name, card_no, expiry_date, card_type, user_id, create_time, update_time,
+        create_person, update_person,is_sign,pay_channel
+    </sql>
+
+    <!--查询-->
+    <select id="query" resultMap="BaseResultMap" parameterType="com.qccr.paycenter.dal.domain.pay.CardInfoDO" >
+        select
+        <include refid="Base_Column_List" />
+        from card_info
+        where 1=1
+
+        <if test="id != null" >
+            and id = #{id}
+        </if>
+
+        <if test="cardName != null" >
+            and card_name = #{cardName}
+        </if>
+
+        <if test="cardNo != null" >
+            and card_no = #{cardNo}
+        </if>
+
+        <if test="expiryDate != null" >
+            and expiry_date = #{expiryDate}
+        </if>
+
+        <if test="cardType != null" >
+            and card_type = #{cardType}
+        </if>
+
+        <if test="userId != null" >
+            and user_id = #{userId}
+        </if>
+
+        <if test="createTime != null" >
+            and create_time = #{createTime}
+        </if>
+
+        <if test="updateTime != null" >
+            and update_time = #{updateTime}
+        </if>
+
+        <if test="createPerson != null" >
+            and create_person = #{createPerson}
+        </if>
+
+        <if test="updatePerson != null" >
+            and update_person = #{updatePerson}
+        </if>
+        <if test="isSign != null" >
+            and is_sign = #{isSign}
+        </if>
+        <if test="payChannel != null" >
+            and pay_channel = #{payChannel}
+        </if>
+
+    </select>
+
+    <!--删除-->
+    <delete id="delete" parameterType="java.lang.Long" >
+        delete from card_info
+        where id = #{id}
+    </delete>
+
+    <!--增加-->
+    <insert id="insert" parameterType="com.qccr.paycenter.dal.domain.pay.CardInfoDO" >
+        insert into card_info (id, card_name, card_no, expiry_date, card_type, user_id, create_time,
+        update_time, create_person, update_person, is_sign,pay_channel)
+        values (#{id}, #{cardName}, #{cardNo}, #{expiryDate}, #{cardType}, #{userId}, now(),
+        now(), #{createPerson}, #{updatePerson},#{isSign},#{payChannel})
+    </insert>
+
+    <!--更新-->
+    <update id="update" parameterType="com.qccr.paycenter.dal.domain.pay.CardInfoDO" >
+        update card_info
+        <set >
+            id = #{id}
+
+            <if test="cardName != null" >
+                ,card_name = #{cardName}
+            </if>
+
+            <if test="cardNo != null" >
+                ,card_no = #{cardNo}
+            </if>
+
+            <if test="expiryDate != null" >
+                ,expiry_date = #{expiryDate}
+            </if>
+
+            <if test="cardType != null" >
+                ,card_type = #{cardType}
+            </if>
+
+            <if test="userId != null" >
+                ,user_id = #{userId}
+            </if>
+
+            <if test="createTime != null" >
+                ,create_time = #{createTime}
+            </if>
+
+            <if test="updateTime != null" >
+                ,update_time = #{updateTime}
+            </if>
+
+            <if test="createPerson != null" >
+                ,create_person = #{createPerson}
+            </if>
+
+            <if test="updatePerson != null" >
+                ,update_person = #{updatePerson}
+            </if>
+            <if test="isSign != null" >
+                ,is_sign = #{isSign}
+            </if>
+            <if test="payChannel != null" >
+                ,pay_channel = #{payChannel}
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
+    <!--<select id="findByCardNo" parameterType="string" resultMap="BaseResultMap">-->
+        <!--select-->
+        <!--<include refid="Base_Column_List" />-->
+        <!--from card_info-->
+        <!--where card_no=#{cardNo} limit 1-->
+    <!--</select>-->
+    <!--<update id="signCard" parameterType="string">-->
+        <!--update card_info  set  is_sign=1,update_time=now() where card_no = #{cardNo}-->
+    <!--</update>-->
+    <select id="findByUserIdAndPayChannel" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from card_info
+        where user_id = #{userId} and  pay_channel = #{payChannel} limit 1
+    </select>
+    <update id="updateByUserIdAndPayChannel" parameterType="java.util.Map" >
+        update card_info
+        <set >
+            card_no = #{cardNo}
+            ,card_name = #{cardName}
+            ,expiry_date = #{expiryDate}
+            ,update_time = now()
+        </set>
+        where user_id = #{userId} and  pay_channel = #{payChannel} and is_sign=0
+    </update>
+    <!--<select id="findSignedByCardNo" parameterType="string" resultMap="BaseResultMap">-->
+        <!--select-->
+        <!--<include refid="Base_Column_List" />-->
+        <!--from card_info-->
+        <!--where card_no=#{cardNo} and  is_sign=1 limit 1-->
+    <!--</select>-->
+    <update id="signCardByUserIdAndPayChannel" parameterType="string">
+        update card_info  set  is_sign=1,update_time=now() where user_id = #{userId} and  pay_channel = #{payChannel}
+    </update>
+    <select id="findSignedByUserIdAndPayChannel" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from card_info
+        where user_id = #{userId} and  pay_channel = #{payChannel} and  is_sign=1 limit 1
+    </select>
+</mapper>

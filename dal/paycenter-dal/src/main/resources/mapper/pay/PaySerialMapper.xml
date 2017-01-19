@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qccr.paycenter.dal.mapper.pay.PaySerialMapper">
+
+	<resultMap id="PaySerialResultMap" type="com.qccr.paycenter.dal.domain.pay.PaySerialDO">	
+	
+		<id column="id"  property="id" />
+		<id column="serial_no"  property="serialNo" />
+		<id column="pay_no"  property="payNo" />		
+		<id column="subject" property="subject" />
+		<id column="mch_id"  property="mchId" />
+		<id column="payer_account"  property="payerAccount" />
+		<id column="amount" property="amount" />
+		<id column="status" property="status" />
+		<id column="pay_channel" property="payChannel" />
+		<id column="pay_type" property="payType" />
+		<id column="return_url" property="returnUrl" />
+		<id column="notify_url" property="notifyUrl" />
+		<id column="pay_time" property="payTime" />		
+		<id column="is_timeout" property="isTimeout" />
+		<id column="out_time" property="outTime" />
+		<id column="bill_no" property="billNo" />
+		<id column="success_time" property="successTime" />
+		<id column="product_name" property="productName" />
+		<id column="create_time" property="createTime" />		
+		<id column="update_time" property="updateTime" />
+		<id column="create_person" property="createPerson" />
+		<id column="update_person" property="updatePerson" />
+		<id column="retain"  property="retain" />
+	</resultMap>
+
+	<sql id="table_name">
+		pay_serial
+	</sql>
+
+	<sql id="PaySerial_Column_List">
+		id,serial_no, pay_no, subject, mch_id, payer_account, amount, status,pay_channel,pay_type,return_url, 
+		notify_url, pay_time, is_timeout, out_time,bill_no,product_name,
+		create_time, update_time,create_person, update_person
+	</sql>
+
+
+
+	<insert id="insert" parameterType="com.qccr.paycenter.dal.domain.pay.PaySerialDO">
+		insert into pay_serial (serial_no, pay_no, subject, mch_id, payer_account, amount,pay_channel,pay_type,return_url, 
+		notify_url, pay_time, is_timeout, out_time,bill_no,product_name,create_time,update_time) values(#{serialNo},#{payNo},#{subject},#{mchId},
+		#{payerAccount},#{amount},#{payChannel},#{payType},#{returnUrl},#{notifyUrl},#{payTime},#{isTimeout},#{outTime},#{billNo},
+		#{productName},now(),now())
+	</insert>
+	
+	<select id="findLastByChannelAndType" parameterType="java.util.Map" resultMap="PaySerialResultMap">
+		select 
+			<include refid="PaySerial_Column_List" />
+	    from pay_serial
+	    where pay_no = #{payNo} and pay_channel=#{payChannel}
+		<if test="payType != null and payType != '' " >
+			and pay_type= #{payType}
+		</if>
+	    order by id desc limit 1
+		
+	</select>
+
+	<update id="updateStatus" parameterType = "java.util.Map" >
+		update pay_serial set status = #{status},update_time=now() where id=#{id}
+	</update>
+
+	<update id="syncPayMerge" parameterType="java.util.Map">
+		update pay_serial set status = #{status},bill_no=#{billNo},update_time=now(),mch_id = #{mchId},success_time=#{successTime},receipt_amount=#{receiptAmount},payer_account = #{payerAccount} where id=#{id} and  status in(0,4)
+
+	</update>
+
+	<select id="queryByPayNo" parameterType="string" resultMap="PaySerialResultMap">
+		select
+		<include refid="PaySerial_Column_List" />
+		from pay_serial
+		where pay_no = #{payNo}
+	</select>
+
+	<select id="findLastByPayNo" parameterType="string" resultMap="PaySerialResultMap">
+		select
+		<include refid="PaySerial_Column_List" />
+		from pay_serial
+		where pay_no = #{payNo}
+		order by id desc limit 1
+
+	</select>
+
+	<!--更新-->
+	<update id="update" parameterType="com.qccr.paycenter.dal.domain.pay.PaySerialDO" >
+		update pay_serial
+		<set >
+			id = #{id}
+
+			<if test="serialNo != null" >
+				,serial_no = #{serialNo}
+			</if>
+
+			<if test="payNo != null" >
+				,pay_no = #{payNo}
+			</if>
+
+			<if test="productName != null" >
+				,product_name = #{productName}
+			</if>
+
+			<if test="payChannel != null" >
+				,pay_channel = #{payChannel}
+			</if>
+
+			<if test="payType != null" >
+				,pay_type = #{payType}
+			</if>
+
+			<if test="mchId != null" >
+				,mch_id = #{mchId}
+			</if>
+
+			<if test="payerAccount != null" >
+				,payer_account = #{payerAccount}
+			</if>
+
+			<if test="amount != null" >
+				,amount = #{amount}
+			</if>
+
+			<if test="payData != null" >
+				,pay_data = #{payData}
+			</if>
+
+			<if test="isTimeout != null" >
+				,is_timeout = #{isTimeout}
+			</if>
+
+			<if test="outTime != null" >
+				,out_time = #{outTime}
+			</if>
+
+			<if test="payTime != null" >
+				,pay_time = #{payTime}
+			</if>
+
+			<if test="returnUrl != null" >
+				,return_url = #{returnUrl}
+			</if>
+
+			<if test="notifyUrl != null" >
+				,notify_url = #{notifyUrl}
+			</if>
+
+			<if test="billNo != null" >
+				,bill_no = #{billNo}
+			</if>
+
+			<if test="createTime != null" >
+				,create_time = #{createTime}
+			</if>
+
+			<if test="updateTime != null" >
+				,update_time = #{updateTime}
+			</if>
+
+			<if test="createPerson != null" >
+				,create_person = #{createPerson}
+			</if>
+
+			<if test="updatePerson != null" >
+				,update_person = #{updatePerson}
+			</if>
+
+			<if test="subject != null" >
+				,subject = #{subject}
+			</if>
+
+			<if test="status != null" >
+				,status = #{status}
+			</if>
+
+			<if test="retain != null" >
+				,retain = #{retain}
+			</if>
+
+		</set>
+		where id = #{id}
+	</update>
+
+	<select id="findPayOrderSerial" resultMap="PaySerialResultMap">
+		SELECT  <include refid="PaySerial_Column_List" /> FROM  <include refid="table_name" />
+		WHERE pay_no = #{payNo} and pay_channel=#{payChannel} and pay_type = #{payType} limit 1
+	</select>
+	 	
+</mapper>

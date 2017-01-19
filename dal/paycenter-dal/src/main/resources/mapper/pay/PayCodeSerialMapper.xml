@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qccr.paycenter.dal.mapper.pay.PayCodeSerialMapper" >
+    
+    <resultMap id="BaseResultMap" type="com.qccr.paycenter.dal.domain.pay.PayCodeSerialDO" >
+        <id column="id" property="id" />
+        <result column="card_no" property="cardNo" />
+        <result column="request_add_data" property="requestAddData" />
+        <result column="return_add_data" property="returnAddData" />
+        <result column="trace_no" property="traceNo" />
+        <result column="invioce_no" property="invioceNo" />
+        <result column="user_id" property="userId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_person" property="createPerson" />
+        <result column="update_person" property="updatePerson" />
+        <result column="pay_channel" property="payChannel" />
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+        id, card_no, request_add_data, return_add_data, trace_no, invioce_no, user_id, create_time, 
+        update_time, create_person, update_person,pay_channel
+    </sql>
+    
+    <!--查询-->
+    <select id="query" resultMap="BaseResultMap" parameterType="com.qccr.paycenter.dal.domain.pay.PayCodeSerialDO" >
+        select
+        <include refid="Base_Column_List" />
+            from pay_code_serial
+            where 1=1 
+
+        <if test="id != null" >
+              and id = #{id}
+        </if>
+        
+        <if test="cardNo != null" >
+              and card_no = #{cardNo}
+        </if>
+        
+        <if test="requestAddData != null" >
+              and request_add_data = #{requestAddData}
+        </if>
+        
+        <if test="returnAddData != null" >
+              and return_add_data = #{returnAddData}
+        </if>
+        
+        <if test="traceNo != null" >
+              and trace_no = #{traceNo}
+        </if>
+        
+        <if test="invioceNo != null" >
+              and invioce_no = #{invioceNo}
+        </if>
+        
+        <if test="userId != null" >
+              and user_id = #{userId}
+        </if>
+        
+        <if test="createTime != null" >
+              and create_time = #{createTime}
+        </if>
+        
+        <if test="updateTime != null" >
+              and update_time = #{updateTime}
+        </if>
+        
+        <if test="createPerson != null" >
+              and create_person = #{createPerson}
+        </if>
+        
+        <if test="updatePerson != null" >
+              and update_person = #{updatePerson}
+        </if>
+        <if test="payChannel != null" >
+            and pay_channel = #{payChannel}
+        </if>
+        
+    </select>
+    
+    <!--删除-->
+    <delete id="delete" parameterType="java.lang.Long" >
+        delete from pay_code_serial
+        where id = #{id}
+    </delete>
+    
+    <!--增加-->
+    <insert id="insert" parameterType="com.qccr.paycenter.dal.domain.pay.PayCodeSerialDO" >
+        insert into pay_code_serial (id, card_no, request_add_data, return_add_data, trace_no, invioce_no, 
+            user_id, create_time, update_time, create_person, update_person,pay_channel)
+        values (#{id}, #{cardNo}, #{requestAddData}, #{returnAddData}, #{traceNo}, #{invioceNo}, 
+            #{userId}, now(), now(), #{createPerson}, #{updatePerson},#{payChannel})
+    </insert>
+    
+    <!--更新-->
+    <update id="update" parameterType="com.qccr.paycenter.dal.domain.pay.PayCodeSerialDO" >
+        update pay_code_serial
+        <set >
+            id = #{id}
+            
+            <if test="cardNo != null" >
+                ,card_no = #{cardNo}
+            </if>
+            
+            <if test="requestAddData != null" >
+                ,request_add_data = #{requestAddData}
+            </if>
+            
+            <if test="returnAddData != null" >
+                ,return_add_data = #{returnAddData}
+            </if>
+            
+            <if test="traceNo != null" >
+                ,trace_no = #{traceNo}
+            </if>
+            
+            <if test="invioceNo != null" >
+                ,invioce_no = #{invioceNo}
+            </if>
+            
+            <if test="userId != null" >
+                ,user_id = #{userId}
+            </if>
+            
+            <if test="createTime != null" >
+                ,create_time = #{createTime}
+            </if>
+            
+            <if test="updateTime != null" >
+                ,update_time = #{updateTime}
+            </if>
+            
+            <if test="createPerson != null" >
+                ,create_person = #{createPerson}
+            </if>
+            
+            <if test="updatePerson != null" >
+                ,update_person = #{updatePerson}
+            </if>
+            <if test="payChannel != null" >
+                ,pay_channel = #{payChannel}
+            </if>
+            
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findByInvioceNo" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from pay_code_serial
+        where invioce_no=#{invioceNo} and to_days(create_time) = to_days(now()) limit 1
+    </select>
+    <update id="addReturnAddData" parameterType="string">
+        update pay_code_serial  set  return_add_data=#{returnAddData},update_time=now() where invioce_no=#{invioceNo} and to_days(create_time) = to_days(now())
+    </update>
+    <!--<select id="findLatestByCardNo" parameterType="string" resultMap="BaseResultMap">-->
+        <!--select-->
+        <!--<include refid="Base_Column_List" />-->
+        <!--from pay_code_serial-->
+        <!--where card_no = #{cardNo}  ORDER BY create_time DESC limit 1-->
+    <!--</select>-->
+    <select id="findLatestByUserIdAndPayChannel" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from pay_code_serial
+        where user_id = #{userId} and  pay_channel = #{payChannel} ORDER BY create_time DESC limit 1
+    </select>
+</mapper>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qccr.paycenter.dal.mapper.pay.PayOrderMapper">
+
+	<resultMap id="PayOrderResultMap" type="com.qccr.paycenter.dal.domain.pay.PayOrderDO">
+		<id column="id"  property="id" />
+		<id column="pay_no"  property="payNo" />
+		<id column="business_no"  property="businessNo" />
+		<id column="business_type"  property="businessType" />
+		<id column="status" property="status" />		
+		<id column="notify_url" property="notifyUrl" />
+		<id column="notify_status" property="notifyStatus" />		
+		<id column="pay_serial_no" property="paySerialNo" />
+		<id column="bill_no" property="billNo" />
+		<id column="pay_channel" property="payChannel" />
+		<id column="pay_type" property="payType" />
+		<id column="mch_id" property="mchId" />
+		<id column="payer_account" property="payerAccount" />		
+		<id column="amount" property="amount" />
+		<id column="partner" property="partner" />
+		<id column="out_time" property="outTime" />
+		<id column="pay_time" property="payTime" />
+		<id column="success_time" property="successTime" />
+		<id column="create_time" property="createTime" />		
+		<id column="update_time" property="updateTime" />
+		<id column="create_person" property="createPerson" />
+		<id column="update_person" property="updatePerson" />
+		<id column="retain"  property="retain" />
+		<id column="trade_no" property="tradeNo" />
+		<id column="user_id" property="userId" />
+		<id column="remitter" property="remitter" />
+		<id column="short_pay_no" property="shortPayNo" />
+		<id column="request_param" property="requestParam" />
+		<id column="return_param" property="returnParam" />
+		<id column="receipt_amount" property="receiptAmount" />
+		<id column="debit_user_id" property="debitUserId" />
+
+	</resultMap>
+
+	<resultMap id="PayTimeoutOrderResultMap" type="com.qccr.paycenter.model.dal.dbo.pay.PayTimeoutOrderQueryDO">
+		<result column="pay_no" property="payNo" />
+		<result column="out_time" property="outTime" />
+		<result column="pay_channel" property="payChannel" />
+		<result column="pay_type" property="payType" />
+	</resultMap>
+	
+	<resultMap id="PayCancelOrderQueryDO" type="com.qccr.paycenter.model.dal.dbo.pay.PayCancelOrderQueryDO" >
+		<result column="pay_no" property="payNo" />
+		<result column="debit_user_id" property="userId" />
+		<result column="out_time" property="outTime" />
+		<result column="pay_channel" property="payChannel" />
+		<result column="pay_type" property="payType" />
+	</resultMap>
+
+	<sql id="PayOrder_Column_List">
+		id, pay_no, business_no, business_type, status, amount,bill_no,pay_channel,pay_type
+		,mch_id,payer_account,partner,out_time,pay_time,success_time, create_time, update_time,create_person, update_person
+		,trade_no,user_id,remitter,short_pay_no,request_param,return_param,debit_user_id
+	</sql>
+	
+	<select id="findByBusinessNo" resultMap="PayOrderResultMap">
+		select
+			<include refid="PayOrder_Column_List" />
+		from pay_order
+		
+		where business_no=#{bizNo}
+	
+	</select>
+	
+	
+	<insert id="insert" parameterType="com.qccr.paycenter.dal.domain.pay.PayOrderDO">
+	 	
+		insert into pay_order(pay_no, business_no, business_type, status,
+		notify_url, notify_status, pay_serial_no, amount,partner,pay_time,out_time,create_time,update_time,trade_no,user_id,remitter,short_pay_no,request_param,return_param,debit_user_id) values(#{payNo},
+		#{businessNo},#{businessType},#{status},#{notifyUrl},#{notifyStatus},#{paySerialNo},#{amount},#{partner},#{payTime},#{outTime},now(),now(),#{tradeNo},#{userId},#{remitter},#{shortPayNo},#{requestParam},#{returnParam},#{debitUserId})
+
+	</insert>
+	
+	<update id="updateSerialNo" parameterType="com.qccr.paycenter.dal.domain.pay.PayOrderDO">
+	
+		update pay_order  set  pay_serial_no=#{paySerialNo},update_time=now() where pay_no = #{payNo}
+	
+	</update>
+	
+
+	<select id="findByPayNo" resultMap="PayOrderResultMap" parameterType="string">
+		select
+			<include refid="PayOrder_Column_List" />
+		from pay_order
+		where pay_no = #{payNo} limit 1
+     </select>
+
+
+	<update id="callbackUpdateByPayNo" parameterType="java.util.Map">
+		update pay_order set  status=#{status} ,pay_serial_no =#{serialNo},mch_id=#{mchId},payer_account=#{payerAccount}
+		,bill_no=#{billNo},pay_channel=#{payChannel},pay_type=#{payType},receipt_amount=#{receiptAmount},success_time=#{successTime},update_time=now()
+		where pay_no=#{payNo} and  status in(0,4)
+	</update>
+
+
+	<select id="findByBizNoAndPartner" parameterType="java.util.Map" resultMap="PayOrderResultMap">
+		select
+		<include refid="PayOrder_Column_List" />
+		from pay_order
+		where business_no=#{businessNo} and partner=#{partner} limit 1
+	</select>
+
+	<select id="queryNextTimeoutOrders" resultMap="PayTimeoutOrderResultMap">
+		select pay_no,out_time, pay_channel, pay_type
+		FROM pay_order
+		where out_time <![CDATA[ >= ]]> date_add(now(), interval - #{beforeMinutes} MINUTE )
+		and out_time <![CDATA[ <= ]]> #{outTime}
+		and status IN (0,4)
+		and mod(id,#{shardingCount}) in
+		<foreach collection="shardingItems" item="shard" index="index" open="(" separator="," close=")">
+			#{shard}
+		</foreach>
+	</select>
+	
+	<select id="queryNextCancelFacePayOrders" resultMap="PayCancelOrderQueryDO">
+		select po.pay_no,po.debit_user_id,po.out_time, po.pay_channel, po.pay_type
+		FROM pay_order po,pay_serial ps
+		where ps.pay_no=po.pay_no
+	    and po.out_time <![CDATA[ >= ]]> date_add(now(), interval - #{beforeMinutes} MINUTE )
+		and po.out_time <![CDATA[ < ]]> #{createTime}
+		and po.status IN (0,4)
+		and ps.pay_type='alipay_facepay'
+		and ps.pay_channel='alipay'
+		and mod(po.id,#{shardingCount}) in
+		<foreach collection="shardingItems" item="shard" index="index" open="(" separator="," close=")">
+			#{shard}
+		</foreach>
+	</select>
+
+	<update id="overtimeClose">
+		  update  pay_order set status = 5,update_time=now() where  pay_no=#{payNo} and status in(0,4)
+	</update>
+
+	<update id="payCloseByTradeNo">
+		update  pay_order set status = #{status},update_time=now() where  trade_no=#{tradeNo} and status in(0,2,4)
+	</update>
+
+	<update id="payCloseByBizNo">
+		update  pay_order set status = #{status},update_time=now() where  business_no=#{businessNo} and status in(0,2,4)
+	</update>
+
+	<select id="sumAmountByTradeNo"  resultType="int" parameterType="string">
+		select ifnull(sum(amount),0) from pay_order
+		where trade_no=#{tradeNo} and status=1
+	</select>
+
+	<select id="queryAlreadyPaidByTradeNo" parameterType="string" resultMap="PayOrderResultMap">
+		select
+		<include refid="PayOrder_Column_List" />
+		from pay_order
+		where trade_no=#{tradeNo} and status=1
+		ORDER BY success_time
+	</select>
+
+	<select id="findByTradeNoAndAmount" parameterType="java.util.Map" resultMap="PayOrderResultMap">
+		select
+		<include refid="PayOrder_Column_List" />
+		from pay_order
+		where status=0 and trade_no=#{tradeNo} and amount=#{amount} limit 1
+	</select>
+
+	<select id="countByTradeNo"  resultType="int" parameterType="string">
+		select count(id) from pay_order
+		where trade_no=#{tradeNo}
+	</select>
+
+	<select id="findByTradeNoAndUnpaid" parameterType="string" resultMap="PayOrderResultMap">
+		select
+		<include refid="PayOrder_Column_List" />
+		from pay_order
+		where status=0 and trade_no=#{tradeNo} limit 1
+	</select>
+	<select id="queryAllByTradeNo" parameterType="string" resultMap="PayOrderResultMap">
+		select
+		<include refid="PayOrder_Column_List" />
+		from pay_order
+		where trade_no=#{tradeNo}
+	</select>
+
+	<update id="updateParam" parameterType="string">
+		update pay_order  set  request_param=#{requestParam},return_param=#{returnParam},update_time=now() where pay_no=#{payNo} and status=0
+	</update>
+
+	<update id="updateShortPayNo" parameterType="string">
+		update pay_order  set  short_pay_no=#{shortPayNo},update_time=now() where pay_no=#{payNo}
+	</update>
+</mapper>
